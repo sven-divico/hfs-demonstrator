@@ -1,0 +1,348 @@
+/* =====================================================================
+   HFS Demonstrator — Polaris-family CSS tokens + base layout
+   Custom properties pierce shadow DOM so components can read --hfs-*
+   ===================================================================== */
+
+/* -------------------------------------------------------------------
+   1. Root tokens
+   ------------------------------------------------------------------- */
+:root {
+  --hfs-font: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+  /* Surfaces */
+  --hfs-color-bg:           #f4f5f7;
+  --hfs-color-surface:      #fff;
+  --hfs-color-border:       #d8dde3;
+
+  /* Text */
+  --hfs-color-text:         #1b2734;
+  --hfs-color-text-muted:   #5b6770;
+
+  /* Brand */
+  --hfs-color-primary:      #1f8476;
+  --hfs-color-primary-bg:   #e8f5f1;
+
+  /* Top-bar */
+  --hfs-color-topbar:       #1b2734;
+  --hfs-color-topbar-text:  #fff;
+
+  /* Status dot fill colours */
+  --hfs-status-open:        #9aa5b1;   /* Draft — ring only, no fill */
+  --hfs-status-pending:     #f59e0b;   /* Pending Dispatch, Assigned */
+  --hfs-status-scheduled:   #3b82f6;   /* Scheduled, Work In Progress */
+  --hfs-status-done:        #10b981;   /* Done */
+  --hfs-status-problem:     #dc2626;   /* Problem */
+
+  /* Spacing scale */
+  --hfs-space-xs:  4px;
+  --hfs-space-sm:  8px;
+  --hfs-space-md:  16px;
+  --hfs-space-lg:  24px;
+
+  /* Topbar height — referenced by layout */
+  --hfs-topbar-h: 48px;
+  --hfs-tabstrip-h: 40px;
+  --hfs-sidebar-w: 200px;
+}
+
+/* -------------------------------------------------------------------
+   2. Base resets and body
+   ------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--hfs-font);
+  font-size: 14px;
+  color: var(--hfs-color-text);
+  background: var(--hfs-color-bg);
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+}
+
+/* -------------------------------------------------------------------
+   3. Topbar
+   ------------------------------------------------------------------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  height: var(--hfs-topbar-h);
+  background: var(--hfs-color-topbar);
+  color: var(--hfs-color-topbar-text);
+  padding: 0 var(--hfs-space-md);
+  gap: var(--hfs-space-md);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.topbar .brand {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: var(--hfs-color-primary);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.topbar nav {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+}
+
+.topbar nav span {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.topbar nav span:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+/* -------------------------------------------------------------------
+   4. Workspace pill
+   ------------------------------------------------------------------- */
+.workspace-pill {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 4px 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------------
+   5. Tab-strip host
+      The tab-strip shadow DOM handles its own internal styles;
+      we only set the host display here so it blocks.
+   ------------------------------------------------------------------- */
+tab-strip {
+  display: block;
+  flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------------
+   6. Workspace — sidebar + content
+   ------------------------------------------------------------------- */
+.workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* -------------------------------------------------------------------
+   7. Sidebar
+   ------------------------------------------------------------------- */
+.sidebar {
+  width: var(--hfs-sidebar-w);
+  flex-shrink: 0;
+  background: #fafbfc;
+  border-right: 1px solid var(--hfs-color-border);
+  padding: var(--hfs-space-md) 0;
+  overflow-y: auto;
+}
+
+.sidebar-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--hfs-color-text-muted);
+  padding: 0 var(--hfs-space-md) var(--hfs-space-sm);
+}
+
+.list-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font-family: var(--hfs-font);
+  font-size: 13px;
+  color: var(--hfs-color-text);
+  padding: 7px var(--hfs-space-md);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.list-item:hover {
+  background: var(--hfs-color-primary-bg);
+  color: var(--hfs-color-primary);
+}
+
+.list-item.active {
+  background: var(--hfs-color-primary-bg);
+  color: var(--hfs-color-primary);
+  border-left-color: var(--hfs-color-primary);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------
+   8. Content pane
+   ------------------------------------------------------------------- */
+.content {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+/* Tab panes — hidden by default; tab-strip activates the right one */
+[data-tab-pane] {
+  display: block;
+}
+
+[data-tab-pane][hidden] {
+  display: none;
+}
+
+/* -------------------------------------------------------------------
+   9. Matrix table base styles
+      <wo-status-matrix> renders in shadow DOM but picks up --hfs-*
+      vars from :root. The table rules below are also reproduced in
+      the component's internal shadow style, which references these
+      same token names. They are included here for reference / any
+      light-DOM fallback use.
+   ------------------------------------------------------------------- */
+table {
+  border-collapse: collapse;
+  font-size: 11px;
+  font-family: var(--hfs-font);
+  width: max-content;
+  min-width: 100%;
+}
+
+th, td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--hfs-color-border);
+  border-right: 1px solid var(--hfs-color-border);
+  white-space: nowrap;
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--hfs-color-text-muted);
+  background: var(--hfs-color-bg);
+}
+
+/* Sticky thead */
+thead th {
+  position: sticky;
+  top: 0;
+  background: #f4f5f7;
+  z-index: 2;
+}
+
+/* Sticky first column (component adds class="sticky" to its first-col cells) */
+td.sticky,
+th.sticky {
+  position: sticky;
+  left: 0;
+  background: var(--hfs-color-surface);
+  z-index: 1;
+}
+
+thead th.sticky {
+  z-index: 3; /* corner cell above both axes */
+  background: #f4f5f7;
+}
+
+tr:hover td {
+  background: #f0f9f7;
+}
+
+tr:hover td.sticky {
+  background: #f0f9f7;
+}
+
+/* -------------------------------------------------------------------
+   10. Status dot classes
+       Used both in the matrix shadow DOM and wo-detail-tab shadow DOM.
+       Because those components live in shadow DOM they won't inherit
+       these rules directly — they reference the --hfs-status-* vars
+       from :root in their own internal <style> blocks instead.
+       These light-DOM rules serve any non-shadow-DOM usage and act as
+       the canonical documentation of the mapping.
+   ------------------------------------------------------------------- */
+
+/* Base dot — inline-block circle */
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+/* open / Draft — gray ring, no fill */
+.dot.open {
+  background: transparent;
+  border: 1.5px solid var(--hfs-status-open);
+}
+
+/* pending — Pending Dispatch, Assigned — amber filled */
+.dot.pending {
+  background: var(--hfs-status-pending);
+  border: none;
+}
+
+/* scheduled — Scheduled, Work In Progress — blue filled */
+.dot.scheduled {
+  background: var(--hfs-status-scheduled);
+  border: none;
+}
+
+/* done — Done — green filled */
+.dot.done {
+  background: var(--hfs-status-done);
+  border: none;
+}
+
+/* problem — Problem — red filled */
+.dot.problem {
+  background: var(--hfs-status-problem);
+  border: none;
+}
+
+/* na — not applicable — renders as em-dash, no circle */
+.dot.na {
+  display: inline;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  border: none;
+  color: var(--hfs-color-text-muted);
+  font-size: 12px;
+  cursor: default;
+}
+
+.dot.na::before {
+  content: "—";
+}
