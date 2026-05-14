@@ -8,6 +8,7 @@ Read in this order.
 |---|---|---|
 | 1 | [02-developer-onboarding.md](02-developer-onboarding.md) | Hands-on path from zero to "I get it" in about an hour. Try the live demo, run it locally, use it as a reference oracle while you port. |
 | 2 | [01-api-specification.md](01-api-specification.md) | The full contract — custom-element API, REST endpoints with JSON schemas, CSS token contract, porting steps, reference data. |
+| 3 | [03-snow-recipe.md](03-snow-recipe.md) | Copy-paste GlideScript for the four Scripted REST endpoints — Script Include, pivot logic, ACLs, pagination Link header, update-set hygiene. Read after you've understood the contract. |
 
 If you've never seen the demo, start with [02](02-developer-onboarding.md) — it's faster than reading the spec cold. Come back to [01](01-api-specification.md) when you're writing code and need an authoritative reference.
 
