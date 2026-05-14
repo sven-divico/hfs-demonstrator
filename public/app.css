@@ -294,13 +294,12 @@ tab-strip > button[slot="tab"][data-tab-id="matrix"] > .tab-close {
   min-width: 0;         /* allow flex children to shrink below content size */
 }
 
-/* Tab panes — hidden by default; tab-strip activates the right one */
-[data-tab-pane] {
-  display: block;
-}
-
+/* Tab panes — let each element use its native display value (e.g. the
+   matrix host is flex column). Only force display:none for the hidden
+   ones; the UA `[hidden]` rule does this too, but the explicit selector
+   wins reliably across all browsers and over any later author rules. */
 [data-tab-pane][hidden] {
-  display: none;
+  display: none !important;
 }
 
 /* -------------------------------------------------------------------
