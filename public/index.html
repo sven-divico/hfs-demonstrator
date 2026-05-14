@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>HFS Demo — Workspace</title>
+  <link rel="stylesheet" href="/app.css">
+  <script type="module" src="/components/tab-strip.js"></script>
+  <script type="module" src="/components/wo-status-matrix.js"></script>
+  <script type="module" src="/components/wo-detail-tab.js"></script>
+  <script type="module" src="/components/task-detail-tab.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">DG</div>
+    <nav><span>All</span><span>Favorites</span><span>History</span><span>Workspaces</span></nav>
+    <div class="workspace-pill">HFS Demo Workspace ★</div>
+  </header>
+  <tab-strip>
+    <button slot="tab" data-tab-id="matrix" class="active">Legacy Orders</button>
+  </tab-strip>
+  <main class="workspace">
+    <aside class="sidebar">
+      <div class="sidebar-section-title">My Lists</div>
+      <button class="list-item active" data-list="legacy">Legacy Orders</button>
+      <button class="list-item" data-list="attention">Needs Attention</button>
+    </aside>
+    <section class="content">
+      <wo-status-matrix id="matrix-view" data-endpoint="/api/work-orders/matrix" data-list="legacy" data-tab-pane="matrix"></wo-status-matrix>
+    </section>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
