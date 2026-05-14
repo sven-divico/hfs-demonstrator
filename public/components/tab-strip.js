@@ -28,9 +28,11 @@ class TabStrip extends HTMLElement {
         nav {
           display: flex;
           align-items: flex-end;
+          /* No fixed height — strip auto-sizes to the tab button plus the
+             padding-top below, so the active tab fills the strip and reads
+             as a single block (≈ 1.5× table-row height). */
           padding: 8px var(--hfs-space-md, 16px) 0;
-          gap: 4px;                                   /* spacing between tabs */
-          height: var(--hfs-tabstrip-h, 70px);
+          gap: 4px;
           overflow-x: auto;
           scrollbar-width: none;
         }
@@ -40,7 +42,7 @@ class TabStrip extends HTMLElement {
           border: 1px solid transparent;              /* reserved space so active state doesn't shift */
           border-bottom: none;
           border-radius: 4px 4px 0 0;
-          padding: 18px 22px;                         /* taller + wider tabs */
+          padding: 16px 22px;                         /* tab visible height ≈ 1.5× table row */
           margin-bottom: -1px;                        /* overlap the host border */
           cursor: pointer;
           font-family: var(--hfs-font, system-ui, sans-serif);

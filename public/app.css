@@ -44,7 +44,10 @@
 
   /* Topbar height — referenced by layout */
   --hfs-topbar-h: 48px;
-  --hfs-tabstrip-h: 70px;          /* +20% from 58 → 70 for stronger affordance */
+  /* Tab strip height auto-sizes to its tab button (≈ 1.5× table row).
+     The variable is kept for any future consumers but is no longer
+     applied as a fixed height inside the component. */
+  --hfs-tabstrip-h: auto;
   --hfs-toolbar-h: 40px;           /* action toolbar above tables */
   --hfs-sidebar-w: 200px;
 }
