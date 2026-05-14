@@ -28,9 +28,9 @@ class TabStrip extends HTMLElement {
         nav {
           display: flex;
           align-items: stretch;                        /* tabs fill the strip height */
-          padding: 8px var(--hfs-space-md, 16px) 0;
+          padding: 0 var(--hfs-space-md, 16px);
           gap: 4px;
-          height: var(--hfs-tabstrip-h, 70px);
+          height: var(--hfs-tabstrip-h, 40px);
           overflow-x: auto;
           scrollbar-width: none;
         }
