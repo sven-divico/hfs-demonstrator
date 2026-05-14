@@ -43,7 +43,7 @@
 
   /* Topbar height — referenced by layout */
   --hfs-topbar-h: 48px;
-  --hfs-tabstrip-h: 48px;          /* taller per SNOW reference */
+  --hfs-tabstrip-h: 58px;          /* taller per SNOW reference */
   --hfs-toolbar-h: 40px;           /* action toolbar above tables */
   --hfs-sidebar-w: 200px;
 }
