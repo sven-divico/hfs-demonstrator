@@ -8,3 +8,6 @@ data/
 .superpowers/
 /tmp/
 ~$*
+
+# Local-only — server-specific deploy script
+deploy-to-prod.sh

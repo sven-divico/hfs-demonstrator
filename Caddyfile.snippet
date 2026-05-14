@@ -1,25 +1,22 @@
-# HFS Demonstrator — Caddyfile block
+# HFS Demonstrator — example host Caddyfile block
 #
-# This is a DOCUMENTARY REFERENCE only. It is NOT applied automatically by
-# deploy-to-prod.sh. You must copy this block into /etc/caddy/Caddyfile on
-# the host server by hand (one-time setup).
+# Generic example for fronting the container with a TLS-terminating reverse
+# proxy + HTTP Basic auth. Adapt to your own domain and credentials.
 #
 # Prerequisites:
-#   - Host-native Caddy installed: sudo apt install -y caddy
-#   - DNS A record: hfs-demo.biztechbridge.com → ***REDACTED-IP***
+#   - Host-native Caddy installed
+#   - DNS pointing your chosen hostname at the host's public IP
 #   - A bcrypt password hash generated with: caddy hash-password
 #
-# After editing /etc/caddy/Caddyfile:
+# After editing /etc/caddy/Caddyfile (or your equivalent):
 #   sudo caddy validate --config /etc/caddy/Caddyfile
 #   sudo systemctl reload caddy
-#
-# Caddy will auto-issue a TLS certificate via ACME on the first request.
 
-hfs-demo.biztechbridge.com {
+<your-host>.example.com {
     basicauth {
-        # Username: demo
-        # Replace the hash below with the output of: caddy hash-password
-        demo $2a$14$REPLACE_WITH_BCRYPT_HASH
+        # Replace <username> and the hash below.
+        # Generate the hash with: caddy hash-password
+        <username> $2a$14$REPLACE_WITH_BCRYPT_HASH
     }
-    reverse_proxy localhost:8080
+    reverse_proxy 127.0.0.1:8080
 }
