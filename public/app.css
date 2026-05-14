@@ -12,6 +12,8 @@
   /* Surfaces */
   --hfs-color-bg:           #f4f5f7;
   --hfs-color-surface:      #fff;
+  --hfs-color-sidebar:      #fafbfc;   /* sidebar bg — also active tab bg + banded row */
+  --hfs-color-toolbar:      #eef0f3;   /* darker strip above the table */
   --hfs-color-border:       #d8dde3;
 
   /* Text */
@@ -41,7 +43,8 @@
 
   /* Topbar height — referenced by layout */
   --hfs-topbar-h: 48px;
-  --hfs-tabstrip-h: 40px;
+  --hfs-tabstrip-h: 48px;          /* taller per SNOW reference */
+  --hfs-toolbar-h: 40px;           /* action toolbar above tables */
   --hfs-sidebar-w: 200px;
 }
 
@@ -158,7 +161,7 @@ tab-strip {
 .sidebar {
   width: var(--hfs-sidebar-w);
   flex-shrink: 0;
-  background: #fafbfc;
+  background: var(--hfs-color-sidebar);
   border-right: 1px solid var(--hfs-color-border);
   padding: var(--hfs-space-md) 0;
   overflow-y: auto;
@@ -205,8 +208,9 @@ tab-strip {
    ------------------------------------------------------------------- */
 .content {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;     /* scrolling happens inside each pane (e.g. matrix .table-scroll) */
   position: relative;
+  min-width: 0;         /* allow flex children to shrink below content size */
 }
 
 /* Tab panes — hidden by default; tab-strip activates the right one */

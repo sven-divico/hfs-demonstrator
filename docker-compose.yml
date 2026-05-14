@@ -3,5 +3,7 @@ services:
     build: .
     container_name: hfs-demo
     ports:
-      - "8080:8080"
+      # Listen only on the host loopback so the host-native Caddy
+      # (which owns :80/:443 + TLS + basicauth) is the only path in.
+      - "127.0.0.1:8080:8080"
     restart: unless-stopped

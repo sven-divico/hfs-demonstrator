@@ -27,30 +27,41 @@ class TabStrip extends HTMLElement {
         }
         nav {
           display: flex;
-          padding: 0 var(--hfs-space-md, 16px);
+          align-items: flex-end;
+          padding: 6px var(--hfs-space-md, 16px) 0;
+          gap: 4px;                                   /* spacing between tabs */
+          height: var(--hfs-tabstrip-h, 48px);
           overflow-x: auto;
           scrollbar-width: none;
         }
         nav::-webkit-scrollbar { display: none; }
         ::slotted(button[slot="tab"]) {
-          background: none;
-          border: none;
-          border-bottom: 2px solid transparent;
-          padding: 10px 16px;
+          background: transparent;
+          border: 1px solid transparent;              /* reserved space so active state doesn't shift */
+          border-bottom: none;
+          border-radius: 4px 4px 0 0;
+          padding: 10px 20px;                         /* taller + wider tabs */
+          margin-bottom: -1px;                        /* overlap the host border */
           cursor: pointer;
           font-family: var(--hfs-font, system-ui, sans-serif);
           font-size: 13px;
           color: var(--hfs-color-text-muted, #5b6770);
           white-space: nowrap;
           flex-shrink: 0;
-          transition: color 0.12s, border-color 0.12s;
+          transition: background 0.12s, color 0.12s, border-color 0.12s;
         }
         ::slotted(button[slot="tab"]:hover) {
           color: var(--hfs-color-primary, #1f8476);
+          background: rgba(31, 132, 118, 0.04);
         }
+        /* Active tab — register-card look: matches sidebar bg, no underline,
+           subtle top/side border that "lifts" it off the strip, and a -1px
+           bottom margin so the host's bottom border passes BEHIND it,
+           making the tab feel like one continuous surface with the page below. */
         ::slotted(button[slot="tab"].active) {
-          color: var(--hfs-color-primary, #1f8476);
-          border-bottom-color: var(--hfs-color-primary, #1f8476);
+          color: var(--hfs-color-text, #1b2734);
+          background: var(--hfs-color-sidebar, #fafbfc);
+          border-color: var(--hfs-color-border, #d8dde3);
           font-weight: 600;
         }
       </style>

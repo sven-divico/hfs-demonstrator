@@ -50,13 +50,42 @@ class WoStatusMatrix extends HTMLElement {
     this._shadow.innerHTML = `
       <style>
         :host {
-          display: block;
-          overflow: auto;
+          display: flex;
+          flex-direction: column;
           height: 100%;
           font-family: var(--hfs-font, system-ui, sans-serif);
           font-size: 11px;
           color: var(--hfs-color-text, #1b2734);
+          background: var(--hfs-color-sidebar, #fafbfc);
         }
+
+        /* Pane toolbar — darker grey strip above the table, reserved space
+           for action buttons in a later phase. */
+        .pane-toolbar {
+          height: var(--hfs-toolbar-h, 40px);
+          background: var(--hfs-color-toolbar, #eef0f3);
+          border-bottom: 1px solid var(--hfs-color-border, #d8dde3);
+          display: flex;
+          align-items: center;
+          padding: 0 var(--hfs-space-md, 16px);
+          gap: var(--hfs-space-md, 16px);
+          flex-shrink: 0;
+          font-size: 12px;
+          color: var(--hfs-color-text-muted, #5b6770);
+        }
+        .pane-toolbar .toolbar-hint {
+          font-style: italic;
+          opacity: 0.7;
+        }
+        .pane-toolbar .toolbar-spacer { flex: 1; }
+
+        /* Scroll container for the table */
+        .table-scroll {
+          flex: 1;
+          overflow: auto;
+          background: var(--hfs-color-surface, #fff);
+        }
+
         .loading, .error {
           padding: 32px;
           color: var(--hfs-color-text-muted, #5b6770);
@@ -70,9 +99,8 @@ class WoStatusMatrix extends HTMLElement {
           min-width: 100%;
         }
         th, td {
-          padding: 6px 8px;
-          border-bottom: 1px solid var(--hfs-color-border, #d8dde3);
-          border-right: 1px solid var(--hfs-color-border, #d8dde3);
+          padding: 9px 10px;                          /* a hair more vertical breathing room */
+          /* No row or column borders — banded rows provide separation */
           white-space: nowrap;
           vertical-align: middle;
           text-align: left;
@@ -82,6 +110,7 @@ class WoStatusMatrix extends HTMLElement {
           font-size: 11px;
           color: var(--hfs-color-text-muted, #5b6770);
           background: var(--hfs-color-bg, #f4f5f7);
+          border-bottom: 1px solid var(--hfs-color-border, #d8dde3);
         }
         /* Sticky thead */
         thead th {
@@ -92,18 +121,22 @@ class WoStatusMatrix extends HTMLElement {
         /* Sticky first five columns */
         td.sticky, th.sticky {
           position: sticky;
-          background: var(--hfs-color-surface, #fff);
           z-index: 1;
         }
-        thead th.sticky { z-index: 3; background: var(--hfs-color-bg, #f4f5f7); }
+        thead th.sticky { z-index: 3; }
         td.sticky:nth-child(1), th.sticky:nth-child(1) { left: 0; }
         td.sticky:nth-child(2), th.sticky:nth-child(2) { left: 100px; }
         td.sticky:nth-child(3), th.sticky:nth-child(3) { left: 160px; }
         td.sticky:nth-child(4), th.sticky:nth-child(4) { left: 210px; }
         td.sticky:nth-child(5), th.sticky:nth-child(5) { left: 310px; }
 
-        tr:hover td { background: #f0f9f7; }
-        tr:hover td.sticky { background: #f0f9f7; }
+        /* Banded rows — odd rows white, even rows light grey.
+           Sticky cells inherit the row's band via per-row background. */
+        tbody tr            td            { background: var(--hfs-color-surface, #fff); }
+        tbody tr:nth-child(even) td       { background: var(--hfs-color-sidebar,  #fafbfc); }
+
+        /* Hover — subtle teal tint, applied to every cell including sticky */
+        tbody tr:hover td                 { background: #e8f5f1; }
 
         /* ORDER link */
         a.wo-link {
@@ -153,7 +186,14 @@ class WoStatusMatrix extends HTMLElement {
         }
         .dot.na::before { content: "—"; }
       </style>
-      <div class="loading">Loading…</div>
+      <div class="pane-toolbar">
+        <span class="toolbar-hint">Last refreshed just now</span>
+        <span class="toolbar-spacer"></span>
+        <!-- action buttons land here in the next phase -->
+      </div>
+      <div class="table-scroll">
+        <div class="loading">Loading…</div>
+      </div>
     `;
 
     this._fetch();
@@ -169,11 +209,12 @@ class WoStatusMatrix extends HTMLElement {
     const endpoint = this.dataset.endpoint ?? "/api/work-orders/matrix";
     const list     = this.dataset.list     ?? "legacy";
 
-    this._shadow.querySelector(".loading, .error, table")?.remove?.();
+    const scroll = this._shadow.querySelector(".table-scroll");
+    scroll.innerHTML = "";
     const loading = document.createElement("div");
     loading.className = "loading";
     loading.textContent = "Loading…";
-    this._shadow.appendChild(loading);
+    scroll.appendChild(loading);
 
     try {
       const res = await fetch(`${endpoint}?list=${encodeURIComponent(list)}`);
@@ -188,8 +229,9 @@ class WoStatusMatrix extends HTMLElement {
   }
 
   _render({ columns, rows }) {
+    const scroll = this._shadow.querySelector(".table-scroll");
     // Remove any previous table
-    this._shadow.querySelector("table")?.remove();
+    scroll.querySelector("table")?.remove();
 
     const table = document.createElement("table");
 
@@ -285,7 +327,7 @@ class WoStatusMatrix extends HTMLElement {
       tbody.appendChild(tr);
     }
 
-    this._shadow.appendChild(table);
+    scroll.appendChild(table);
   }
 }
 
