@@ -17,8 +17,8 @@ If you read only one other thing, read [`01-api-specification.md`](01-api-specif
 
 ## Step 1 — Try the live demo (5 minutes)
 
-**URL:** <https://hfs-demo.biztechbridge.com>
-**Credentials:** `demo` / `***REDACTED***` (ask the project lead for fresh ones if these have rotated).
+**URL:** ask the project lead.
+**Credentials:** ask the project lead — credentials are not committed to this repo.
 
 ### What to do, in order
 
