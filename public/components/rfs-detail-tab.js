@@ -1,17 +1,17 @@
 /**
- * <wo-detail-tab> — Work Order detail pane
+ * <rfs-detail-tab> — RFS Work Order detail pane
  *
  * Attributes:
- *   data-wo-id      sys_id of the work order (e.g. "ord-0012867")
- *   data-wo-number  human-readable WO number (e.g. "ORD0012867")
- *   data-tab-pane   tab identifier for tab:close (matches the tab button's data-tab-id)
+ *   data-rfs-id      sys_id of the RFS work order (e.g. "rfs-0020001")
+ *   data-rfs-number  human-readable number (e.g. "RFS0020001")
+ *   data-tab-pane    tab identifier for tab:close
  *
  * Events dispatched on document (bubbles: true, composed: true):
- *   task:open  {woId, woNumber, taskName}   — when a task row is clicked
- *   tab:close  {tabId}                      — when the × button is clicked
+ *   task:open               {coUuid, coNumber, taskName}
+ *   customer-order:open     {coUuid, coNumber}
+ *   tab:close               {tabId}
  */
 
-/** Map task state string → CSS class name (shared mapping across all components) */
 function stateClass(state) {
   switch (state) {
     case "Draft":              return "open";
@@ -30,7 +30,7 @@ function dispatch(type, detail) {
   document.dispatchEvent(new CustomEvent(type, { detail, bubbles: true, composed: true }));
 }
 
-class WoDetailTab extends HTMLElement {
+class RfsDetailTab extends HTMLElement {
   connectedCallback() {
     this._shadow = this.attachShadow({ mode: "open" });
     this._shadow.innerHTML = `
@@ -45,13 +45,9 @@ class WoDetailTab extends HTMLElement {
           overflow: auto;
           box-sizing: border-box;
         }
-        .loading, .error {
-          color: var(--hfs-color-text-muted, #5b6770);
-          padding: 16px 0;
-        }
+        .loading, .error { color: var(--hfs-color-text-muted, #5b6770); padding: 16px 0; }
         .error { color: var(--hfs-status-problem, #dc2626); }
 
-        /* Header card */
         .header-card {
           background: var(--hfs-color-surface, #fff);
           border: 1px solid var(--hfs-color-border, #d8dde3);
@@ -67,7 +63,30 @@ class WoDetailTab extends HTMLElement {
           font-size: 16px;
           font-weight: 700;
           color: var(--hfs-color-primary, #1f8476);
-          margin-bottom: 6px;
+          margin-bottom: 4px;
+        }
+        .breadcrumb {
+          font-size: 12px;
+          color: var(--hfs-color-text-muted, #5b6770);
+          margin-bottom: 8px;
+        }
+        .breadcrumb a {
+          color: var(--hfs-color-primary, #1f8476);
+          text-decoration: none;
+          font-weight: 600;
+          cursor: pointer;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .rfs-type-pill {
+          display: inline-block;
+          font-size: 11px;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 10px;
+          background: var(--hfs-color-primary-bg, #e8f5f1);
+          color: var(--hfs-color-primary, #1f8476);
+          margin-left: 8px;
+          vertical-align: middle;
         }
         .header-meta {
           display: flex;
@@ -76,9 +95,7 @@ class WoDetailTab extends HTMLElement {
           font-size: 12px;
           color: var(--hfs-color-text-muted, #5b6770);
         }
-        .header-meta span strong {
-          color: var(--hfs-color-text, #1b2734);
-        }
+        .header-meta span strong { color: var(--hfs-color-text, #1b2734); }
         .close-btn {
           background: none;
           border: 1px solid var(--hfs-color-border, #d8dde3);
@@ -100,7 +117,6 @@ class WoDetailTab extends HTMLElement {
           border-color: var(--hfs-status-problem, #dc2626);
         }
 
-        /* Task table */
         table {
           width: 100%;
           border-collapse: collapse;
@@ -124,18 +140,13 @@ class WoDetailTab extends HTMLElement {
           color: var(--hfs-color-text-muted, #5b6770);
           background: var(--hfs-color-bg, #f4f5f7);
         }
-        tbody tr {
-          cursor: pointer;
-          transition: background 0.1s;
-        }
+        tbody tr { cursor: pointer; transition: background 0.1s; }
         tbody tr:hover td { background: #f0f9f7; }
         tbody tr:last-child td { border-bottom: none; }
 
-        /* State dots */
         .dot {
           display: inline-block;
-          width: 9px;
-          height: 9px;
+          width: 9px; height: 9px;
           border-radius: 50%;
           vertical-align: middle;
           margin-right: 6px;
@@ -157,104 +168,103 @@ class WoDetailTab extends HTMLElement {
       </style>
       <div class="loading">Loading…</div>
     `;
-
     this._load();
   }
 
   async _load() {
-    const woId     = this.dataset.woId;
-    const woNumber = this.dataset.woNumber;
-
+    const rfsId = this.dataset.rfsId;
     try {
-      const res = await fetch(`/api/work-orders/${encodeURIComponent(woId)}`);
+      const res = await fetch(`/api/rfs-orders/${encodeURIComponent(rfsId)}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       this._shadow.querySelector(".loading")?.remove();
-      this._render(data, woNumber);
+      this._render(data);
     } catch (err) {
       const el = this._shadow.querySelector(".loading");
       if (el) { el.className = "error"; el.textContent = `Error: ${err.message}`; }
     }
   }
 
-  _render(data, woNumber) {
-    const woId   = this.dataset.woId;
-    const tabId  = this.dataset.tabPane;
+  _render(data) {
+    const tabId = this.dataset.tabPane;
+    const co = data.customer_order ?? {};
 
-    // --- Header card ---
     const card = document.createElement("div");
     card.className = "header-card";
 
     const info = document.createElement("div");
     info.className = "header-info";
-    info.innerHTML = `
-      <h2>${data.number}</h2>
-      <div class="header-meta">
-        <span><strong>Account:</strong> ${data.account ?? "—"}</span>
-        <span><strong>Address:</strong> ${data.address ?? "—"}, ${data.city ?? ""}</span>
-        <span><strong>Construction:</strong> ${data.construction_status ?? "—"}</span>
-        <span><strong>Set:</strong> ${data.set_name ?? "—"}</span>
-      </div>
+
+    const breadcrumb = document.createElement("div");
+    breadcrumb.className = "breadcrumb";
+    const coLink = document.createElement("a");
+    coLink.textContent = `Customer Order ${co.number ?? ""}`;
+    coLink.addEventListener("click", e => {
+      e.preventDefault();
+      dispatch("customer-order:open", { coUuid: co.uuid, coNumber: co.number });
+    });
+    breadcrumb.appendChild(document.createTextNode("← "));
+    breadcrumb.appendChild(coLink);
+    info.appendChild(breadcrumb);
+
+    const h2 = document.createElement("h2");
+    h2.textContent = data.number;
+    const pill = document.createElement("span");
+    pill.className = "rfs-type-pill";
+    pill.textContent = data.rfs_type;
+    h2.appendChild(pill);
+    info.appendChild(h2);
+
+    const meta = document.createElement("div");
+    meta.className = "header-meta";
+    meta.innerHTML = `
+      <span><strong>Customer:</strong> ${co.customer_name ?? "—"}</span>
+      <span><strong>Address:</strong> ${co.address ?? "—"}, ${co.city ?? ""}</span>
+      <span><strong>Construction:</strong> ${co.construction_status ?? "—"}</span>
+      <span><strong>Set:</strong> ${co.set_name ?? "—"}</span>
     `;
+    info.appendChild(meta);
 
     const closeBtn = document.createElement("button");
     closeBtn.className = "close-btn";
     closeBtn.textContent = "×";
     closeBtn.title = "Close tab";
-    closeBtn.addEventListener("click", () => {
-      dispatch("tab:close", { tabId });
-    });
+    closeBtn.addEventListener("click", () => dispatch("tab:close", { tabId }));
 
     card.appendChild(info);
     card.appendChild(closeBtn);
     this._shadow.appendChild(card);
 
-    // --- Task table ---
-    const table  = document.createElement("table");
-    const thead  = table.createTHead();
-    const hRow   = thead.insertRow();
+    const table = document.createElement("table");
+    const thead = table.createTHead();
+    const hRow = thead.insertRow();
     for (const label of ["Task", "State", "Assignment Group", "Last Updated"]) {
       const th = document.createElement("th");
       th.textContent = label;
       hRow.appendChild(th);
     }
-
     const tbody = table.createTBody();
-    const tasks = data.tasks ?? [];
-    for (const task of tasks) {
+    for (const task of (data.tasks ?? [])) {
       const tr = tbody.insertRow();
       tr.title = `Click to open ${task.short_description}`;
       tr.addEventListener("click", () => {
         dispatch("task:open", {
-          woId,
-          woNumber: woNumber ?? data.number,
-          taskName: task.short_description
+          coUuid: co.uuid,
+          coNumber: co.number,
+          taskName: task.short_description,
         });
       });
-
-      // Task name
-      const tdName = tr.insertCell();
-      tdName.textContent = task.short_description;
-
-      // State with dot
+      tr.insertCell().textContent = task.short_description;
       const tdState = tr.insertCell();
-      const dot  = document.createElement("span");
-      const cls  = stateClass(task.state);
-      dot.className = `dot ${cls}`;
+      const dot = document.createElement("span");
+      dot.className = `dot ${stateClass(task.state)}`;
       tdState.appendChild(dot);
       tdState.appendChild(document.createTextNode(task.state));
-
-      // Assignment group
-      const tdGroup = tr.insertCell();
-      tdGroup.textContent = task.assignment_group ?? "—";
-
-      // Last updated
-      const tdUpdated = tr.insertCell();
-      tdUpdated.textContent = task.sys_updated_on ?? "—";
+      tr.insertCell().textContent = task.assignment_group || "—";
+      tr.insertCell().textContent = task.sys_updated_on || "—";
     }
-
     this._shadow.appendChild(table);
   }
 }
 
-customElements.define("wo-detail-tab", WoDetailTab);
+customElements.define("rfs-detail-tab", RfsDetailTab);

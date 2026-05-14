@@ -2,9 +2,10 @@
  * <tab-strip> — Workspace tab bar
  *
  * Listens on document for:
- *   wo:open   {woId, woNumber}         → opens / activates a wo-detail-tab pane
- *   task:open {woId, woNumber, taskName} → opens / activates a task-detail-tab pane
- *   tab:close {tabId}                  → removes the tab + pane, falls back to matrix
+ *   customer-order:open  {coUuid, coNumber}              → opens / activates a customer-order-detail-tab pane
+ *   rfs:open             {rfsId, rfsNumber, rfsType}     → opens / activates an rfs-detail-tab pane
+ *   task:open            {coUuid, coNumber, taskName}    → opens / activates a task-detail-tab pane
+ *   tab:close            {tabId}                         → removes the tab + pane, falls back to matrix
  *
  * The "matrix" tab (data-tab-id="matrix") is permanent / non-closeable.
  * Tab buttons are slotted into light DOM so they pick up ::slotted styles.
@@ -81,9 +82,10 @@ class TabStrip extends HTMLElement {
     `;
 
     // Listen for custom events on document — bubbles + composed crosses shadow DOM
-    document.addEventListener("wo:open",   e => this.openWoTab(e.detail));
-    document.addEventListener("task:open", e => this.openTaskTab(e.detail));
-    document.addEventListener("tab:close", e => this.closeTab(e.detail.tabId));
+    document.addEventListener("customer-order:open", e => this.openCustomerOrderTab(e.detail));
+    document.addEventListener("rfs:open",            e => this.openRfsTab(e.detail));
+    document.addEventListener("task:open",           e => this.openTaskTab(e.detail));
+    document.addEventListener("tab:close",           e => this.closeTab(e.detail.tabId));
 
     // Delegate clicks on the slotted tab buttons (they are light DOM, so we
     // listen on `this` rather than shadowRoot)
@@ -118,13 +120,13 @@ class TabStrip extends HTMLElement {
     this.activate("matrix"); // fall back to matrix
   }
 
-  openWoTab({ woId, woNumber }) {
-    const id = `wo-${woId}`;
+  openCustomerOrderTab({ coUuid, coNumber }) {
+    const id = `co-${coUuid}`;
     if (!this.tabs.has(id)) {
-      const button = this._mkTabButton(id, woNumber, "wo");
-      const pane   = document.createElement("wo-detail-tab");
-      pane.setAttribute("data-wo-id",     woId);
-      pane.setAttribute("data-wo-number", woNumber);
+      const button = this._mkTabButton(id, coNumber, "co");
+      const pane   = document.createElement("customer-order-detail-tab");
+      pane.setAttribute("data-co-uuid",   coUuid);
+      pane.setAttribute("data-co-number", coNumber);
       pane.setAttribute("data-tab-pane",  id);
       document.querySelector(".content").appendChild(pane);
       this.tabs.set(id, { button, pane });
@@ -132,14 +134,29 @@ class TabStrip extends HTMLElement {
     this.activate(id);
   }
 
-  openTaskTab({ woId, woNumber, taskName }) {
-    const safeName = taskName.replace(/[^a-zA-Z0-9\-_]/g, "_");
-    const id = `task-${woId}-${safeName}`;
+  openRfsTab({ rfsId, rfsNumber, rfsType }) {
+    const id = `rfs-${rfsId}`;
     if (!this.tabs.has(id)) {
-      const button = this._mkTabButton(id, `${woNumber} · ${taskName}`, "task");
+      const label = `${rfsNumber} · ${rfsType}`;
+      const button = this._mkTabButton(id, label, "wo");
+      const pane   = document.createElement("rfs-detail-tab");
+      pane.setAttribute("data-rfs-id",     rfsId);
+      pane.setAttribute("data-rfs-number", rfsNumber);
+      pane.setAttribute("data-tab-pane",   id);
+      document.querySelector(".content").appendChild(pane);
+      this.tabs.set(id, { button, pane });
+    }
+    this.activate(id);
+  }
+
+  openTaskTab({ coUuid, coNumber, taskName }) {
+    const safeName = taskName.replace(/[^a-zA-Z0-9\-_]/g, "_");
+    const id = `task-${coUuid}-${safeName}`;
+    if (!this.tabs.has(id)) {
+      const button = this._mkTabButton(id, `${coNumber} · ${taskName}`, "task");
       const pane   = document.createElement("task-detail-tab");
-      pane.setAttribute("data-wo-id",     woId);
-      pane.setAttribute("data-wo-number", woNumber);
+      pane.setAttribute("data-co-uuid",   coUuid);
+      pane.setAttribute("data-co-number", coNumber);
       pane.setAttribute("data-task-name", taskName);
       pane.setAttribute("data-tab-pane",  id);
       document.querySelector(".content").appendChild(pane);
@@ -178,8 +195,10 @@ class TabStrip extends HTMLElement {
 const TAB_ICON = {
   // 3 horizontal lines — list / grid metaphor
   list: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>`,
-  // Clipboard outline — a Work Order record
+  // Clipboard outline — a Work Order / RFS record
   wo:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 11h6M9 15h4"/></svg>`,
+  // User badge — a Customer Order record (business-facing)
+  co:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>`,
   // Check-square — a Task / action item
   task: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg>`,
   // ✕ close icon used inside each closeable tab

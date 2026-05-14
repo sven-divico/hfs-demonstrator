@@ -6,6 +6,7 @@ data/
 .env.*
 .DS_Store
 .superpowers/
+.claude/
 /tmp/
 ~$*
 

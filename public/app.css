@@ -191,6 +191,7 @@ wo-status-matrix {
    icons here. Each type gets a --tab-accent that inherits into the
    tab-strip shadow tree where the active-tab box-shadow reads it. */
 tab-strip > button[slot="tab"][data-tab-type="list"] { --tab-accent: var(--hfs-color-primary); }
+tab-strip > button[slot="tab"][data-tab-type="co"]   { --tab-accent: var(--hfs-color-primary); }
 tab-strip > button[slot="tab"][data-tab-type="wo"]   { --tab-accent: var(--hfs-status-scheduled); }
 tab-strip > button[slot="tab"][data-tab-type="task"] { --tab-accent: var(--hfs-status-pending); }
 

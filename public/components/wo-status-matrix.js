@@ -6,8 +6,8 @@
  *   data-list       "legacy" | "attention"  (observed — refetches on change)
  *
  * Events dispatched on document (bubbles: true, composed: true):
- *   wo:open   {woId, woNumber}
- *   task:open {woId, woNumber, taskName}
+ *   customer-order:open  {coUuid, coNumber}
+ *   task:open            {coUuid, coNumber, taskName}
  */
 
 /** Map task state string → CSS class name */
@@ -303,7 +303,7 @@ class WoStatusMatrix extends HTMLElement {
     const hRow  = thead.insertRow();
 
     // Five fixed headers — each sticky
-    for (const [i, label] of ["ORDER", "Status", "City", "Address", "Construction"].entries()) {
+    for (const [i, label] of ["CUSTOMER ORDER", "Status", "City", "Address", "Construction"].entries()) {
       const th = document.createElement("th");
       th.className = "sticky";
       th.textContent = label;
@@ -323,7 +323,7 @@ class WoStatusMatrix extends HTMLElement {
     for (const row of rows) {
       const tr = tbody.insertRow();
 
-      // 1. ORDER cell — clickable link
+      // 1. Customer Order cell — clickable link to merged CO tab
       const tdOrder = tr.insertCell();
       tdOrder.className = "sticky";
       const a = document.createElement("a");
@@ -332,7 +332,7 @@ class WoStatusMatrix extends HTMLElement {
       a.textContent = row.number;
       a.addEventListener("click", e => {
         e.preventDefault();
-        dispatch("wo:open", { woId: row.sys_id, woNumber: row.number });
+        dispatch("customer-order:open", { coUuid: row.uuid, coNumber: row.number });
       });
       tdOrder.appendChild(a);
 
@@ -380,7 +380,7 @@ class WoStatusMatrix extends HTMLElement {
 
         if (cls !== "na") {
           dot.addEventListener("click", () => {
-            dispatch("task:open", { woId: row.sys_id, woNumber: row.number, taskName: col.name });
+            dispatch("task:open", { coUuid: row.uuid, coNumber: row.number, taskName: col.name });
           });
         }
 

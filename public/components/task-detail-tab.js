@@ -2,8 +2,8 @@
  * <task-detail-tab> — Single-task detail pane
  *
  * Attributes:
- *   data-wo-id      sys_id of the parent work order (e.g. "ord-0012867")
- *   data-wo-number  human-readable WO number (e.g. "ORD0012867")
+ *   data-co-uuid    uuid of the parent Customer Order (e.g. "co-0010001")
+ *   data-co-number  human-readable CO number (e.g. "CO-26-7T4K-NM9P")
  *   data-task-name  canonical German task name (e.g. "HV-S", "Genehmigungen")
  *   data-tab-pane   tab identifier for tab:close
  *
@@ -160,26 +160,26 @@ class TaskDetailTab extends HTMLElement {
   }
 
   async _load() {
-    const woId     = this.dataset.woId;
+    const coUuid   = this.dataset.coUuid;
     const taskName = this.dataset.taskName;
-    const woNumber = this.dataset.woNumber;
+    const coNumber = this.dataset.coNumber;
     const tabId    = this.dataset.tabPane;
 
     try {
-      const url = `/api/work-orders/${encodeURIComponent(woId)}/tasks/${encodeURIComponent(taskName)}`;
+      const url = `/api/customer-orders/${encodeURIComponent(coUuid)}/tasks/${encodeURIComponent(taskName)}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const task = await res.json();
 
       this._shadow.querySelector(".loading")?.remove();
-      this._render(task, { woId, woNumber, taskName, tabId });
+      this._render(task, { coUuid, coNumber, taskName, tabId });
     } catch (err) {
       const el = this._shadow.querySelector(".loading");
       if (el) { el.className = "error"; el.textContent = `Error: ${err.message}`; }
     }
   }
 
-  _render(task, { woId, woNumber, taskName, tabId }) {
+  _render(task, { coUuid, coNumber, taskName, tabId }) {
     // --- Header card ---
     const card = document.createElement("div");
     card.className = "header-card";
@@ -188,7 +188,7 @@ class TaskDetailTab extends HTMLElement {
     info.className = "header-info";
     info.innerHTML = `
       <h2>${taskName}</h2>
-      <div class="subtitle">on ${woNumber}</div>
+      <div class="subtitle">Customer Order <strong>${coNumber}</strong>${task.rfs_type ? ` &nbsp;·&nbsp; <span style="font-size:11px;">${task.rfs_type} RFS</span>` : ""}</div>
     `;
 
     const closeBtn = document.createElement("button");
