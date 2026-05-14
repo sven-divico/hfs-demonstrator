@@ -28,5 +28,9 @@ Pivot table (one row per Work Order × one column per task type) over `wm_order`
 
 ## Related Files
 
+- GitHub repo: <https://github.com/sven-divico/hfs-demonstrator>
+- `docs/superpowers/specs/2026-05-14-hfs-demonstrator-design.md` — approved design
+- `docs/superpowers/plans/2026-05-14-hfs-demonstrator.md` — implementation plan
+- `HANDOVER.md` — SNOW developer handover doc
 - `docs/vault/session-logs/` — session history
 - `docs/vault/daily-notes/` — daily journal
