@@ -153,8 +153,21 @@ class TabStrip extends HTMLElement {
     b.slot = "tab";
     b.dataset.tabId   = tabId;
     b.dataset.tabType = type;
-    b.innerHTML = `${TAB_ICON[type] ?? TAB_ICON.list}<span class="tab-label"></span>`;
+    b.innerHTML = `
+      ${TAB_ICON[type] ?? TAB_ICON.list}
+      <span class="tab-label"></span>
+      <span class="tab-close" role="button" aria-label="Close tab" title="Close tab">${TAB_ICON.close}</span>
+    `;
     b.querySelector(".tab-label").textContent = label;
+
+    // Close icon: stop the click from also activating the tab
+    b.querySelector(".tab-close").addEventListener("click", e => {
+      e.stopPropagation();
+      document.dispatchEvent(new CustomEvent("tab:close", {
+        detail: { tabId }, bubbles: true, composed: true,
+      }));
+    });
+
     this.appendChild(b);
     return b;
   }
@@ -169,6 +182,8 @@ const TAB_ICON = {
   wo:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 11h6M9 15h4"/></svg>`,
   // Check-square — a Task / action item
   task: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg>`,
+  // ✕ close icon used inside each closeable tab
+  close: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
 };
 
 customElements.define("tab-strip", TabStrip);

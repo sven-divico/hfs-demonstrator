@@ -164,11 +164,18 @@ The matrix endpoint. Pre-pivoted server-side — the frontend never does row→c
 | Param | Values | Default |
 |-------|--------|---------|
 | `list` | `"legacy"` (all WOs) \| `"attention"` (WOs with ≥ 1 `Problem` task) | `"legacy"` |
+| `limit` | integer, 1–200 (clamped) | `25` |
+| `offset` | integer ≥ 0 | `0` |
+
+**SNOW mapping:** these map 1:1 to `sysparm_limit` / `sysparm_offset` on a Scripted REST list resource. The `total` field in the response gives the row count for the current `list` filter (not affected by limit/offset); use it to drive Prev/Next button enabled-state and the "X–Y of Z" label.
 
 **Response shape:**
 
 ```json
 {
+  "total":  25,
+  "offset": 0,
+  "limit":  25,
   "columns": [ /* same array as /api/task-columns */ ],
   "rows": [
     {

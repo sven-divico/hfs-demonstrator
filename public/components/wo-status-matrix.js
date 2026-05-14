@@ -59,9 +59,13 @@ class WoStatusMatrix extends HTMLElement {
           background: var(--hfs-color-sidebar, #fafbfc);
         }
 
-        /* Scroll container for the table */
+        /* Scroll container for the table.
+           min-height: 0 is mandatory — a flex column child defaults to
+           min-height: auto (= content size) and would refuse to shrink
+           below the table's natural height, suppressing vertical scroll. */
         .table-scroll {
           flex: 1;
+          min-height: 0;
           overflow: auto;
           background: var(--hfs-color-surface, #fff);
         }
@@ -165,17 +169,95 @@ class WoStatusMatrix extends HTMLElement {
           cursor: default;
         }
         .dot.na::before { content: "—"; }
+
+        /* Pagination footer */
+        .paginator {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px var(--hfs-space-md, 16px);
+          border-top: 1px solid var(--hfs-color-border, #d8dde3);
+          background: var(--hfs-color-bg, #f4f5f7);
+          font-size: 12px;
+          color: var(--hfs-color-text-muted, #5b6770);
+        }
+        .paginator .range { font-weight: 600; color: var(--hfs-color-text, #1b2734); }
+        .paginator .grow  { flex: 1; }
+        .paginator button {
+          font-family: inherit;
+          font-size: 12px;
+          color: var(--hfs-color-text);
+          background: var(--hfs-color-surface, #fff);
+          border: 1px solid var(--hfs-color-border, #d8dde3);
+          border-radius: 4px;
+          padding: 5px 10px;
+          cursor: pointer;
+          transition: background 0.12s, border-color 0.12s, color 0.12s;
+        }
+        .paginator button:hover:not(:disabled) {
+          color: var(--hfs-color-primary, #1f8476);
+          border-color: var(--hfs-color-primary, #1f8476);
+          background: var(--hfs-color-primary-bg, #e8f5f1);
+        }
+        .paginator button:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
+        .paginator select {
+          font-family: inherit;
+          font-size: 12px;
+          padding: 4px 6px;
+          border: 1px solid var(--hfs-color-border);
+          border-radius: 4px;
+          background: var(--hfs-color-surface);
+          cursor: pointer;
+        }
       </style>
       <div class="table-scroll">
         <div class="loading">Loading…</div>
       </div>
+      <div class="paginator" hidden>
+        <span class="range" data-role="range"></span>
+        <span class="grow"></span>
+        <span>Rows:</span>
+        <select data-role="limit">
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+        </select>
+        <button data-role="prev" type="button">‹ Prev</button>
+        <button data-role="next" type="button">Next ›</button>
+      </div>
     `;
+
+    // State
+    this._limit  = 25;
+    this._offset = 0;
+
+    // Wire paginator controls
+    const root = this._shadow;
+    root.querySelector('[data-role="prev"]').addEventListener("click", () => {
+      this._offset = Math.max(0, this._offset - this._limit);
+      this._fetch();
+    });
+    root.querySelector('[data-role="next"]').addEventListener("click", () => {
+      this._offset = this._offset + this._limit;
+      this._fetch();
+    });
+    root.querySelector('[data-role="limit"]').addEventListener("change", e => {
+      this._limit  = Number(e.target.value);
+      this._offset = 0;
+      this._fetch();
+    });
 
     this._fetch();
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
     if (name === "data-list" && oldVal !== null && oldVal !== newVal && this._shadow) {
+      this._offset = 0;                                    // reset to first page on list switch
       this._fetch();
     }
   }
@@ -191,12 +273,18 @@ class WoStatusMatrix extends HTMLElement {
     loading.textContent = "Loading…";
     scroll.appendChild(loading);
 
+    const url = new URL(endpoint, location.origin);
+    url.searchParams.set("list",   list);
+    url.searchParams.set("limit",  String(this._limit));
+    url.searchParams.set("offset", String(this._offset));
+
     try {
-      const res = await fetch(`${endpoint}?list=${encodeURIComponent(list)}`);
+      const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       loading.remove();
       this._render(data);
+      this._renderPaginator(data);
     } catch (err) {
       loading.className = "error";
       loading.textContent = `Failed to load matrix: ${err.message}`;
@@ -303,6 +391,26 @@ class WoStatusMatrix extends HTMLElement {
     }
 
     scroll.appendChild(table);
+  }
+
+  _renderPaginator({ total = 0, offset = 0, limit = this._limit }) {
+    const root = this._shadow;
+    const paginator = root.querySelector(".paginator");
+    if (total === 0) {
+      paginator.hidden = true;
+      return;
+    }
+    paginator.hidden = false;
+
+    const first = offset + 1;
+    const last  = Math.min(offset + limit, total);
+    root.querySelector('[data-role="range"]').textContent = `${first}–${last} of ${total}`;
+
+    const select = root.querySelector('[data-role="limit"]');
+    if (Number(select.value) !== limit) select.value = String(limit);
+
+    root.querySelector('[data-role="prev"]').disabled = offset === 0;
+    root.querySelector('[data-role="next"]').disabled = last >= total;
   }
 }
 
