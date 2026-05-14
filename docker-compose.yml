@@ -1,0 +1,7 @@
+services:
+  hfs-demo:
+    build: .
+    container_name: hfs-demo
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

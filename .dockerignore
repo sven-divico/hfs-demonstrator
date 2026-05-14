@@ -1,0 +1,8 @@
+node_modules
+.git
+.gitignore
+docs
+README.md
+.superpowers
+.DS_Store
+deploy-to-prod.sh
