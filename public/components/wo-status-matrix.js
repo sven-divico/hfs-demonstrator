@@ -59,26 +59,6 @@ class WoStatusMatrix extends HTMLElement {
           background: var(--hfs-color-sidebar, #fafbfc);
         }
 
-        /* Pane toolbar — darker grey strip above the table, reserved space
-           for action buttons in a later phase. */
-        .pane-toolbar {
-          height: var(--hfs-toolbar-h, 40px);
-          background: var(--hfs-color-toolbar, #eef0f3);
-          border-bottom: 1px solid var(--hfs-color-border, #d8dde3);
-          display: flex;
-          align-items: center;
-          padding: 0 var(--hfs-space-md, 16px);
-          gap: var(--hfs-space-md, 16px);
-          flex-shrink: 0;
-          font-size: 12px;
-          color: var(--hfs-color-text-muted, #5b6770);
-        }
-        .pane-toolbar .toolbar-hint {
-          font-style: italic;
-          opacity: 0.7;
-        }
-        .pane-toolbar .toolbar-spacer { flex: 1; }
-
         /* Scroll container for the table */
         .table-scroll {
           flex: 1;
@@ -186,11 +166,6 @@ class WoStatusMatrix extends HTMLElement {
         }
         .dot.na::before { content: "—"; }
       </style>
-      <div class="pane-toolbar">
-        <span class="toolbar-hint">Last refreshed just now</span>
-        <span class="toolbar-spacer"></span>
-        <!-- action buttons land here in the next phase -->
-      </div>
       <div class="table-scroll">
         <div class="loading">Loading…</div>
       </div>
