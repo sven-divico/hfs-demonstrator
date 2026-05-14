@@ -1,0 +1,25 @@
+# HFS Demonstrator — Caddyfile block
+#
+# This is a DOCUMENTARY REFERENCE only. It is NOT applied automatically by
+# deploy-to-prod.sh. You must copy this block into /etc/caddy/Caddyfile on
+# the host server by hand (one-time setup).
+#
+# Prerequisites:
+#   - Host-native Caddy installed: sudo apt install -y caddy
+#   - DNS A record: hfs-demo.biztechbridge.com → ***REDACTED-IP***
+#   - A bcrypt password hash generated with: caddy hash-password
+#
+# After editing /etc/caddy/Caddyfile:
+#   sudo caddy validate --config /etc/caddy/Caddyfile
+#   sudo systemctl reload caddy
+#
+# Caddy will auto-issue a TLS certificate via ACME on the first request.
+
+hfs-demo.biztechbridge.com {
+    basicauth {
+        # Username: demo
+        # Replace the hash below with the output of: caddy hash-password
+        demo $2a$14$REPLACE_WITH_BCRYPT_HASH
+    }
+    reverse_proxy localhost:8080
+}
