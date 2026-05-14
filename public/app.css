@@ -44,10 +44,7 @@
 
   /* Topbar height — referenced by layout */
   --hfs-topbar-h: 48px;
-  /* Tab strip height auto-sizes to its tab button (≈ 1.5× table row).
-     The variable is kept for any future consumers but is no longer
-     applied as a fixed height inside the component. */
-  --hfs-tabstrip-h: auto;
+  --hfs-tabstrip-h: 70px;
   --hfs-toolbar-h: 40px;           /* action toolbar above tables */
   --hfs-sidebar-w: 200px;
 }
@@ -175,6 +172,22 @@ body {
 tab-strip {
   display: block;
   flex-shrink: 0;
+}
+
+/* Tab buttons are slotted (light DOM), so we style them and their SVG
+   icons here. Each type gets a --tab-accent that inherits into the
+   tab-strip shadow tree where the active-tab box-shadow reads it. */
+tab-strip > button[slot="tab"][data-tab-type="list"] { --tab-accent: var(--hfs-color-primary); }
+tab-strip > button[slot="tab"][data-tab-type="wo"]   { --tab-accent: var(--hfs-status-scheduled); }
+tab-strip > button[slot="tab"][data-tab-type="task"] { --tab-accent: var(--hfs-status-pending); }
+
+tab-strip > button[slot="tab"] > svg {
+  color: var(--tab-accent, currentColor);
+  flex-shrink: 0;
+}
+
+tab-strip > button[slot="tab"] > .tab-label {
+  color: inherit;
 }
 
 /* -------------------------------------------------------------------

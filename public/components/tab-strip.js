@@ -27,22 +27,29 @@ class TabStrip extends HTMLElement {
         }
         nav {
           display: flex;
-          align-items: flex-end;
-          /* No fixed height — strip auto-sizes to the tab button plus the
-             padding-top below, so the active tab fills the strip and reads
-             as a single block (≈ 1.5× table-row height). */
+          align-items: stretch;                        /* tabs fill the strip height */
           padding: 8px var(--hfs-space-md, 16px) 0;
           gap: 4px;
+          height: var(--hfs-tabstrip-h, 70px);
           overflow-x: auto;
           scrollbar-width: none;
         }
         nav::-webkit-scrollbar { display: none; }
+
+        /* Per-type accent and SVG coloring live in app.css (the buttons
+           are in light DOM as slotted children, so app.css targets them
+           directly and --tab-accent inherits into this shadow tree for
+           the active-tab box-shadow below). */
+
         ::slotted(button[slot="tab"]) {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
           background: transparent;
           border: 1px solid transparent;              /* reserved space so active state doesn't shift */
           border-bottom: none;
           border-radius: 4px 4px 0 0;
-          padding: 16px 22px;                         /* tab visible height ≈ 1.5× table row */
+          padding: 0 22px;                             /* vertical filled by align-items: stretch */
           margin-bottom: -1px;                        /* overlap the host border */
           cursor: pointer;
           font-family: var(--hfs-font, system-ui, sans-serif);
@@ -53,20 +60,20 @@ class TabStrip extends HTMLElement {
           transition: background 0.12s, color 0.12s, border-color 0.12s;
         }
         ::slotted(button[slot="tab"]:hover) {
-          color: var(--hfs-color-primary, #1f8476);
+          color: var(--tab-accent, var(--hfs-color-primary, #1f8476));
           background: rgba(31, 132, 118, 0.04);
         }
-        /* Active tab — register-card look: distinctly darker bg, a small
-           top accent and subtle shadow that lift it off the strip; the -1px
-           bottom margin lets the host's bottom border pass BEHIND it so
-           it reads as one continuous surface with the page below. */
+        /* Active tab — register-card look: distinctly darker bg, top accent
+           in the tab-type colour, subtle shadow that lifts it off the strip;
+           -1px bottom margin lets the host's bottom border pass BEHIND it
+           so it reads as one continuous surface with the page below. */
         ::slotted(button[slot="tab"].active) {
           color: var(--hfs-color-text, #1b2734);
           background: var(--hfs-color-tab-active, #dde3eb);
           border-color: var(--hfs-color-border, #d8dde3);
           font-weight: 600;
           box-shadow:
-            inset 0 2px 0 0 var(--hfs-color-primary, #1f8476),
+            inset 0 3px 0 0 var(--tab-accent, var(--hfs-color-primary, #1f8476)),
             0 -1px 2px rgba(27, 39, 52, 0.04);
         }
       </style>
@@ -114,7 +121,7 @@ class TabStrip extends HTMLElement {
   openWoTab({ woId, woNumber }) {
     const id = `wo-${woId}`;
     if (!this.tabs.has(id)) {
-      const button = this._mkTabButton(id, woNumber);
+      const button = this._mkTabButton(id, woNumber, "wo");
       const pane   = document.createElement("wo-detail-tab");
       pane.setAttribute("data-wo-id",     woId);
       pane.setAttribute("data-wo-number", woNumber);
@@ -126,11 +133,10 @@ class TabStrip extends HTMLElement {
   }
 
   openTaskTab({ woId, woNumber, taskName }) {
-    // Sanitise taskName into a safe DOM id segment (replace spaces + special chars)
     const safeName = taskName.replace(/[^a-zA-Z0-9\-_]/g, "_");
     const id = `task-${woId}-${safeName}`;
     if (!this.tabs.has(id)) {
-      const button = this._mkTabButton(id, `${woNumber} · ${taskName}`);
+      const button = this._mkTabButton(id, `${woNumber} · ${taskName}`, "task");
       const pane   = document.createElement("task-detail-tab");
       pane.setAttribute("data-wo-id",     woId);
       pane.setAttribute("data-wo-number", woNumber);
@@ -142,14 +148,27 @@ class TabStrip extends HTMLElement {
     this.activate(id);
   }
 
-  _mkTabButton(tabId, label) {
+  _mkTabButton(tabId, label, type = "list") {
     const b = document.createElement("button");
     b.slot = "tab";
-    b.dataset.tabId = tabId;
-    b.textContent = label;
+    b.dataset.tabId   = tabId;
+    b.dataset.tabType = type;
+    b.innerHTML = `${TAB_ICON[type] ?? TAB_ICON.list}<span class="tab-label"></span>`;
+    b.querySelector(".tab-label").textContent = label;
     this.appendChild(b);
     return b;
   }
 }
+
+/** Inline 14px SVG icons — colored via currentColor so they pick up
+ *  the per-type accent on hover/active and muted text otherwise. */
+const TAB_ICON = {
+  // 3 horizontal lines — list / grid metaphor
+  list: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>`,
+  // Clipboard outline — a Work Order record
+  wo:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 11h6M9 15h4"/></svg>`,
+  // Check-square — a Task / action item
+  task: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg>`,
+};
 
 customElements.define("tab-strip", TabStrip);
