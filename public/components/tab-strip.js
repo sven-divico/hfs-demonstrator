@@ -49,7 +49,7 @@ class TabStrip extends HTMLElement {
           border: 1px solid transparent;              /* reserved space so active state doesn't shift */
           border-bottom: none;
           border-radius: 4px 4px 0 0;
-          padding: 0 22px;                             /* vertical filled by align-items: stretch */
+          padding: 0 28px;                             /* vertical filled by align-items: stretch */
           margin-bottom: -1px;                        /* overlap the host border */
           cursor: pointer;
           font-family: var(--hfs-font, system-ui, sans-serif);

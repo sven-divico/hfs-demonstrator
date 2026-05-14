@@ -44,7 +44,7 @@
 
   /* Topbar height — referenced by layout */
   --hfs-topbar-h: 48px;
-  --hfs-tabstrip-h: 70px;
+  --hfs-tabstrip-h: 50px;
   --hfs-toolbar-h: 40px;           /* action toolbar above tables */
   --hfs-sidebar-w: 200px;
 }
