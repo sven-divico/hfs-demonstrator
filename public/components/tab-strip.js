@@ -28,9 +28,9 @@ class TabStrip extends HTMLElement {
         nav {
           display: flex;
           align-items: flex-end;
-          padding: 6px var(--hfs-space-md, 16px) 0;
+          padding: 8px var(--hfs-space-md, 16px) 0;
           gap: 4px;                                   /* spacing between tabs */
-          height: var(--hfs-tabstrip-h, 48px);
+          height: var(--hfs-tabstrip-h, 70px);
           overflow-x: auto;
           scrollbar-width: none;
         }
@@ -40,7 +40,7 @@ class TabStrip extends HTMLElement {
           border: 1px solid transparent;              /* reserved space so active state doesn't shift */
           border-bottom: none;
           border-radius: 4px 4px 0 0;
-          padding: 13px 20px;                         /* taller + wider tabs */
+          padding: 18px 22px;                         /* taller + wider tabs */
           margin-bottom: -1px;                        /* overlap the host border */
           cursor: pointer;
           font-family: var(--hfs-font, system-ui, sans-serif);
@@ -54,15 +54,18 @@ class TabStrip extends HTMLElement {
           color: var(--hfs-color-primary, #1f8476);
           background: rgba(31, 132, 118, 0.04);
         }
-        /* Active tab — register-card look: matches sidebar bg, no underline,
-           subtle top/side border that "lifts" it off the strip, and a -1px
-           bottom margin so the host's bottom border passes BEHIND it,
-           making the tab feel like one continuous surface with the page below. */
+        /* Active tab — register-card look: distinctly darker bg, a small
+           top accent and subtle shadow that lift it off the strip; the -1px
+           bottom margin lets the host's bottom border pass BEHIND it so
+           it reads as one continuous surface with the page below. */
         ::slotted(button[slot="tab"].active) {
           color: var(--hfs-color-text, #1b2734);
-          background: var(--hfs-color-sidebar, #fafbfc);
+          background: var(--hfs-color-tab-active, #dde3eb);
           border-color: var(--hfs-color-border, #d8dde3);
           font-weight: 600;
+          box-shadow:
+            inset 0 2px 0 0 var(--hfs-color-primary, #1f8476),
+            0 -1px 2px rgba(27, 39, 52, 0.04);
         }
       </style>
       <nav><slot name="tab"></slot></nav>

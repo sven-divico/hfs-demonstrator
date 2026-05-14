@@ -12,7 +12,8 @@
   /* Surfaces */
   --hfs-color-bg:           #f4f5f7;
   --hfs-color-surface:      #fff;
-  --hfs-color-sidebar:      #fafbfc;   /* sidebar bg — also active tab bg + banded row */
+  --hfs-color-sidebar:      #fafbfc;   /* sidebar bg + banded row */
+  --hfs-color-tab-active:   #dde3eb;   /* active-tab bg — distinctly darker so it pops */
   --hfs-color-toolbar:      #eef0f3;   /* darker strip above the table */
   --hfs-color-border:       #d8dde3;
 
@@ -43,7 +44,7 @@
 
   /* Topbar height — referenced by layout */
   --hfs-topbar-h: 48px;
-  --hfs-tabstrip-h: 58px;          /* taller per SNOW reference */
+  --hfs-tabstrip-h: 70px;          /* +20% from 58 → 70 for stronger affordance */
   --hfs-toolbar-h: 40px;           /* action toolbar above tables */
   --hfs-sidebar-w: 200px;
 }
