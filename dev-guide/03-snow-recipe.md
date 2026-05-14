@@ -4,6 +4,8 @@
 **Prereq:** read [02-developer-onboarding.md](02-developer-onboarding.md) and have the live demo open in another tab.
 **Goal:** copy-paste-and-adapt scripts for the four endpoints in [01-api-specification.md §B](01-api-specification.md#b-rest-api).
 
+> **Heads-up — data model has evolved.** The scripts in this recipe target the *original* 2-table model (`wm_order` / `wm_task`). The current model is 3 tables: `wm_customer_order` → `wm_rfs_order` → `wm_task`. Use this recipe to understand the GlideScript patterns (pagination, batched task fetch, drilldown), then apply the table/field renames from [05-data-acquisition-after-customer-order.md §4](05-data-acquisition-after-customer-order.md#4-glidescript-reference--paginated-matrix-on-the-new-model) before pasting into your instance.
+
 This is intentionally *opinionated*: the scripts work as-is for a fresh project, are commented for the parts that vary by instance, and follow ServiceNow conventions (`sysparm_*` parameters, status code helpers, JSON error shapes).
 
 ---

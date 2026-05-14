@@ -3,6 +3,8 @@
 **Audience:** ServiceNow developer porting the matrix endpoint.
 **Prereq:** read [03-snow-recipe.md](03-snow-recipe.md). This document is a deeper dive on **how your existing pivot query maps onto the paginated contract** in [01-api-specification.md §B.2](01-api-specification.md#b2-get-apiwork-ordersmatrix).
 
+> **Heads-up — data model has evolved.** The pagination, counting, and `attention`-filter *patterns* in this doc all still apply. The table/field names (`wm_order`, `wm_task.work_order`) describe the *original* 2-table model. Read [05-data-acquisition-after-customer-order.md](05-data-acquisition-after-customer-order.md) for how the same patterns lift onto the 3-table Customer Order → RFS → task model.
+
 Please read carefully. Come back with questions on anything that doesn't sit right.
 
 ---

@@ -10,8 +10,9 @@ Read in this order.
 | 2 | [01-api-specification.md](01-api-specification.md) | The full contract — custom-element API, REST endpoints with JSON schemas, CSS token contract, porting steps, reference data. |
 | 3 | [03-snow-recipe.md](03-snow-recipe.md) | Copy-paste GlideScript for the four Scripted REST endpoints — Script Include, pivot logic, ACLs, pagination Link header, update-set hygiene. Read after you've understood the contract. |
 | 4 | [04-pagination-and-query-improvements.md](04-pagination-and-query-improvements.md) | Deep dive on adapting the existing pivot query for paginated reads. Read alongside [03](03-snow-recipe.md). Contains self-check questions — please work through them and ping back with anything unclear. |
+| 5 | [05-data-acquisition-after-customer-order.md](05-data-acquisition-after-customer-order.md) | **Read this before pasting any pivot/drilldown code.** Delta on the new 3-table model (Customer Order → RFS → task) that supersedes the data-model and SQL/GlideScript sections of 01/03/04. Business motivation: [../docs/business-view.md](../docs/business-view.md). |
 
-If you've never seen the demo, start with [02](02-developer-onboarding.md) — it's faster than reading the spec cold. Come back to [01](01-api-specification.md) when you're writing code and need an authoritative reference.
+If you've never seen the demo, start with [02](02-developer-onboarding.md) — it's faster than reading the spec cold. Come back to [01](01-api-specification.md) when you're writing code and need an authoritative reference, and to [05](05-data-acquisition-after-customer-order.md) for the current data model.
 
 ## Quick links
 
@@ -25,4 +26,4 @@ If you've never seen the demo, start with [02](02-developer-onboarding.md) — i
 4 plain-JS Web Components  +  4 REST endpoints  +  1 task registry  =  the deliverable
 ```
 
-Demo backend (Node + Fastify + SQLite) is **throwaway** — you replace it with Scripted REST APIs against the live `wm_order` / `wm_task` tables. The components, the JSON shapes, and the task-column registry **stay** as-is in your SNOW component.
+Demo backend (Node + Fastify + SQLite) is **throwaway** — you replace it with Scripted REST APIs against the live `wm_customer_order` / `wm_rfs_order` / `wm_task` tables (see [05](05-data-acquisition-after-customer-order.md)). The components, the JSON shapes, and the task-column registry **stay** as-is in your SNOW component.

@@ -4,6 +4,8 @@
 **Source repo:** <https://github.com/sven-divico/hfs-demonstrator>
 **Live reference:** <https://hfs-demo.biztechbridge.com> (creds via project lead)
 
+> **Heads-up — data model has evolved.** The wire contract (request/response shapes) in this doc still describes the current API. The SQL examples that touch `wm_order` / `wm_task` describe the *original* 2-table backing. Read [05-data-acquisition-after-customer-order.md](05-data-acquisition-after-customer-order.md) for the current 3-table model (Customer Order → RFS → task) before writing pivot or drilldown code. The business motivation is in [../docs/business-view.md](../docs/business-view.md).
+
 This document is the complete contract. If something here disagrees with the running demo or the spec, the running demo is authoritative.
 
 ---
