@@ -1,5 +1,14 @@
 # HFS Demonstrator — SNOW Developer Handover
 
+> **⚠ This doc is being superseded.** The current authoritative developer docs live under [`dev-guide/`](dev-guide/):
+>
+> - [`dev-guide/02-developer-onboarding.md`](dev-guide/02-developer-onboarding.md) — start here
+> - [`dev-guide/01-api-specification.md`](dev-guide/01-api-specification.md) — full contract
+>
+> This file is kept for historical context; sections below remain valid but the `dev-guide/` versions are more current.
+
+---
+
 This document covers everything the ServiceNow developer needs to port the four custom elements into a Now Experience component and replace the demo backend with Scripted REST APIs.
 
 **Spec:** [`docs/superpowers/specs/2026-05-14-hfs-demonstrator-design.md`](docs/superpowers/specs/2026-05-14-hfs-demonstrator-design.md)
