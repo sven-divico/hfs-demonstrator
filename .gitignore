@@ -1,0 +1,9 @@
+node_modules/
+dist/
+data/
+*.sqlite
+.env
+.env.*
+.DS_Store
+.superpowers/
+/tmp/
