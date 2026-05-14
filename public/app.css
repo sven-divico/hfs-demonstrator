@@ -174,6 +174,19 @@ tab-strip {
   flex-shrink: 0;
 }
 
+/* Belt-and-braces sizing for the matrix host. Custom elements default to
+   display: inline before their JS defines them, which breaks the inner
+   height: 100% resolution and suppresses the .table-scroll overflow.
+   Setting block-level sizing in the light DOM avoids the FOUC + makes
+   the host's height definite even before the shadow style applies. */
+wo-status-matrix {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* Tab buttons are slotted (light DOM), so we style them and their SVG
    icons here. Each type gets a --tab-accent that inherits into the
    tab-strip shadow tree where the active-tab box-shadow reads it. */
